@@ -38,9 +38,9 @@
 					window.addEventListener(
 						"deviceorientation",
 						function () {
-							document.getElementById("device-alpha").innerText = "" + event.alpha;
-							document.getElementById("device-beta").innerText = "" + event.beta;
-							document.getElementById("device-gamma").innerText = "" + event.gamma;
+							document.getElementById("device-alpha").innerText = "" + Math.round(event.alpha);
+							document.getElementById("device-beta").innerText = "" + Math.round(event.beta);
+							document.getElementById("device-gamma").innerText = "" + Math.round(event.gamma);
 							tilt([event.beta, event.gamma]);
 						},
 						true
@@ -50,10 +50,15 @@
 				if (window.DeviceMotionEvent) {
 					window.addEventListener(
 						"devicemotion",
-						function () {
-							document.getElementById("device-x").innerText = "" + event.x;
-							document.getElementById("device-y").innerText = "" + event.y;
-							document.getElementById("device-z").innerText = "" + event.z;
+						function (event) {
+							document.getElementById("device-x").innerText = Math.round(event.acceleration.x) + " m/s^2";
+							document.getElementById("device-y").innerText = "" + Math.round(event.acceleration.y) + " m/s^2";
+							document.getElementById("device-z").innerText = "" + Math.round(event.acceleration.z) + " m/s^2";
+
+							document.getElementById("device-dalpha").innerText = Math.round(event.rotationRate.alpha) + " deg/s";
+							document.getElementById("device-dbeta").innerText = "" + Math.round(event.rotationRate.beta) + " deg/s;
+							document.getElementById("device-dgamma").innerText = "" + Math.round(event.rotationRate.gamma) + " deg/s;
+							
 							//tilt([event.acceleration.x * 2, event.acceleration.y * 2]);
 						},
 						true
@@ -80,5 +85,6 @@
 		</div>
 		<p>Device Orientation<br /><span class="variable-label">α</span>: <span id="device-alpha" class="variable-value">0</span>, <span class="variable-label">β</span>: <span id="device-beta" class="variable-value">0</span>, <span class="variable-label">γ</span>: <span id="device-gamma" class="variable-value">0</span></p>
 		<p>Device Acceleration<br /><span class="variable-label">x</span>: <span id="device-x" class="variable-value">0</span>, <span class="variable-label">y</span>: <span id="device-y" class="variable-value">0</span>, <span class="variable-label">z</span>: <span id="device-z" class="variable-value">0</span></p>
+		<p>Device Rotation<br /><span class="variable-label">x</span>: <span id="device-dalpha" class="variable-value">0</span>, <span class="variable-label">y</span>: <span id="device-dbeta" class="variable-value">0</span>, <span class="variable-label">z</span>: <span id="device-dgamma" class="variable-value">0</span></p>
 	</body>
 <html>
