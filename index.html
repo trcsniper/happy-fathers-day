@@ -2,8 +2,83 @@
 <html>
 	<head>
 		<title>Happy Father's Day!</title>
+
+		<style>
+			.variable-label {
+				font-family: 'Times New Roman', Times, serif;
+				font-style: italic;
+			}
+
+			.variable-value {
+				font-weight: bold;
+			}
+
+			#parallax-stack {
+				position: relative;
+				width: 100px;
+				height: 100px;
+			}
+
+			.parallax {
+				position: absolute;
+				left: 0px;
+				top: 0px;
+			}
+		</style>
+
+		<script>
+			var parallaxParent;
+			var parallaxElements;
+
+			window.onload = function() {
+				parallaxParent = document.getElementById("parallax-stack");
+				parallaxElements = parallaxParent.getElementsByClassName("parallax");
+
+				if (window.DeviceOrientationEvent) {
+					window.addEventListener(
+						"deviceorientation",
+						function () {
+							document.getElementById("device-alpha").innerText = "" + event.alpha;
+							document.getElementById("device-beta").innerText = "" + event.beta;
+							document.getElementById("device-gamma").innerText = "" + event.gamma;
+							tilt([event.beta, event.gamma]);
+						},
+						true
+						);
+				}
+				
+				if (window.DeviceMotionEvent) {
+					window.addEventListener(
+						"devicemotion",
+						function () {
+							document.getElementById("device-x").innerText = "" + event.x;
+							document.getElementById("device-y").innerText = "" + event.y;
+							document.getElementById("device-z").innerText = "" + event.z;
+							//tilt([event.acceleration.x * 2, event.acceleration.y * 2]);
+						},
+						true
+						);
+				}
+			}
+			
+			function tilt(x, y) {
+				Array.prototype.forEach.call(
+					parallaxElements,
+					function(element) {
+						var scale = element.getAttribute("parallax-scale");
+						element.style.transform = "translate(" + x * scale + ", " + y * scale + ")";
+					}
+					);
+			}
+		</script>
 	</head>
 	<body>
-		Happy Father's Day!
+		<div id="parallax-stack">
+			<div class="parallax" style="background-color: #f0f; width: 100px; height: 100px;" parallax-scale="0.5"></div>
+			<div class="parallax" style="background-color: #0f0; width: 50px; height: 50px;" parallax-scale="1"></div>
+			<div class="parallax" style="background-color: #0ff; width: 25px; height: 25px;" parallax-scale="1.5"></div>
+		</div>
+		<p>Device Orientation<br /><span class="variable-label">α</span>: <span id="device-alpha" class="variable-value">0</span>, <span class="variable-label">β</span>: <span id="device-beta" class="variable-value">0</span>, <span class="variable-label">γ</span>: <span id="device-gamma" class="variable-value">0</span></p>
+		<p>Device Acceleration<br /><span class="variable-label">x</span>: <span id="device-x" class="variable-value">0</span>, <span class="variable-label">y</span>: <span id="device-y" class="variable-value">0</span>, <span class="variable-label">z</span>: <span id="device-z" class="variable-value">0</span></p>
 	</body>
-</html>
+<html>
