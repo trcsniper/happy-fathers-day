@@ -3,6 +3,7 @@
 	<head>
 		<title>Happy Father's Day!</title>
 
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One">
 		<style>
 			body {
 				margin: 0px;
@@ -48,11 +49,15 @@
 			}
 
 			.content-message {
+				background-position-x: center;
+				background-position-y: top;
 			}
 
 			.content-message div {
-				margin-top: 50px;
+				font-family: 'Cherry Bomb One', sans-serif;
+				margin-top: 200px;
 				font-size: 96pt;
+				color: #fff;
 				text-align: center;
 				line-height: 85%;
 			}
@@ -68,7 +73,7 @@
 			var tiltX = 0;
 			var tiltY = 0;
 
-			var rotationSampleCount = 10;
+			var rotationSampleCount = 4;
 			var rotationSampleIndex = 0;
 			var rotationSamplesX = [];
 			var rotationSamplesY = [];
@@ -84,30 +89,10 @@
 
 				setCanvasSize(document.documentElement.clientWidth, document.documentElement.clientHeight);
 
-				if (window.DeviceOrientationEvent) {
-					window.addEventListener(
-						"deviceorientation",
-						function (event) {
-							document.getElementById("device-alpha").innerText = event.alpha.toFixed(2) + " deg";
-							document.getElementById("device-beta").innerText = event.beta.toFixed(2) + " deg";
-							document.getElementById("device-gamma").innerText = event.gamma.toFixed(2) + " deg";
-						},
-						true
-						);
-				}
-				
 				if (window.DeviceMotionEvent) {
 					window.addEventListener(
 						"devicemotion",
 						function (event) {
-							document.getElementById("device-x").innerText = event.acceleration.x.toFixed(2) + " m/s^2";
-							document.getElementById("device-y").innerText = event.acceleration.y.toFixed(2) + " m/s^2";
-							document.getElementById("device-z").innerText = event.acceleration.z.toFixed(2) + " m/s^2";
-
-							document.getElementById("device-dalpha").innerText = event.rotationRate.alpha.toFixed(2) + " deg/s";
-							document.getElementById("device-dbeta").innerText = event.rotationRate.beta.toFixed(2) + " deg/s";
-							document.getElementById("device-dgamma").innerText = event.rotationRate.gamma.toFixed(2) + " deg/s";
-
 							rotationSamplesX[rotationSampleIndex] = event.rotationRate.beta;
 							rotationSamplesY[rotationSampleIndex] = event.rotationRate.alpha;
 							rotationSampleIndex = ++rotationSampleIndex % rotationSampleCount;
@@ -138,11 +123,6 @@
 				mouseX = event.clientX;
 				mouseY = event.clientY;
 
-				document.getElementById("mouse-x").innerText = "" + mouseX;
-				document.getElementById("mouse-y").innerText = "" + mouseY;
-				document.getElementById("mouse-dx").innerText = "" + (mouseX - prevMouseX);
-				document.getElementById("mouse-dy").innerText = "" + (mouseY - prevMouseY);
-
 				tilt((mouseX - prevMouseX) * 0.001, (mouseY - prevMouseY) * 0.001);
 
 				prevMouseX = mouseX;
@@ -162,9 +142,6 @@
 				tiltX = clamp(tiltX + x, -1, 1);
 				tiltY = clamp(tiltY + y, -1, 1);
 
-				document.getElementById("tilt-x").innerText = "" + (tiltX.toFixed(2));
-				document.getElementById("tilt-y").innerText = "" + (tiltY.toFixed(2));
-
 				Array.prototype.forEach.call(
 					parallaxElements,
 					function(element) {
@@ -178,14 +155,8 @@
 	<body>
 		<div id="parallax-stack">
 			<div class="parallax content-background" parallax-scale="-0.05"></div>
+			<div class="parallax content-message" parallax-scale="0.02"><div>HAPPY<br />FATHER'S<br />DAY!</div></div>
 			<div class="parallax content-foreground" parallax-scale="0.05"></div>
-			<div class="parallax content-message" parallax-scale="0.15"><div>HAPPY<br />FATHER'S<br />DAY!</div></div>
 		</div>
-		<p>Device Orientation<br /><span class="variable-label">α</span>: <span id="device-alpha" class="variable-value">0</span>, <span class="variable-label">β</span>: <span id="device-beta" class="variable-value">0</span>, <span class="variable-label">γ</span>: <span id="device-gamma" class="variable-value">0</span></p>
-		<p>Device Acceleration<br /><span class="variable-label">x</span>: <span id="device-x" class="variable-value">0</span>, <span class="variable-label">y</span>: <span id="device-y" class="variable-value">0</span>, <span class="variable-label">z</span>: <span id="device-z" class="variable-value">0</span></p>
-		<p>Device Rotation<br /><span class="variable-label">δα</span>: <span id="device-dalpha" class="variable-value">0</span>, <span class="variable-label">δβ</span>: <span id="device-dbeta" class="variable-value">0</span>, <span class="variable-label">δγ</span>: <span id="device-dgamma" class="variable-value">0</span></p>
-		<p>Mouse Movement<br /><span class="variable-label">δx</span>: <span id="mouse-dx" class="variable-value">0</span>, <span class="variable-label">δy</span>: <span id="mouse-dy" class="variable-value">0</span></p>
-		<p>Curosr Location<br /><span class="variable-label">δx</span>: <span id="mouse-x" class="variable-value">0</span>, <span class="variable-label">δy</span>: <span id="mouse-y" class="variable-value">0</span></p>
-		<p>Parallax Tilt<br /><span class="variable-label">x</span>: <span id="tilt-x" class="variable-value">0</span>, <span class="variable-label">δy</span>: <span id="tilt-y" class="variable-value">0</span></p>
 	</body>
 <html>
