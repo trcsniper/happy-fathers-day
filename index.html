@@ -68,9 +68,19 @@
 			var tiltX = 0;
 			var tiltY = 0;
 
+			var rotationSampleCount = 10;
+			var rotationSampleIndex = 0;
+			var rotationSamplesX = [];
+			var rotationSamplesY = [];
+
 			window.onload = function() {
 				parallaxParent = document.getElementById("parallax-stack");
 				parallaxElements = parallaxParent.getElementsByClassName("parallax");
+
+				for (let sampleIndex = 0; sampleIndex < rotationSampleCount; sampleIndex++) {
+					rotationSamplesX[sampleIndex] = 0;
+					rotationSamplesY[sampleIndex] = 0;
+				}
 
 				setCanvasSize(document.documentElement.clientWidth, document.documentElement.clientHeight);
 
@@ -78,11 +88,9 @@
 					window.addEventListener(
 						"deviceorientation",
 						function (event) {
-							document.getElementById("device-alpha").innerText = event.alpha.toPrecision(2) + " deg";
-							document.getElementById("device-beta").innerText = event.beta.toPrecision(2) + " deg";
-							document.getElementById("device-gamma").innerText = event.gamma.toPrecision(2) + " deg";
-
-							tilt(event.beta, event.gamma);
+							document.getElementById("device-alpha").innerText = event.alpha.toFixed(2) + " deg";
+							document.getElementById("device-beta").innerText = event.beta.toFixed(2) + " deg";
+							document.getElementById("device-gamma").innerText = event.gamma.toFixed(2) + " deg";
 						},
 						true
 						);
@@ -92,15 +100,30 @@
 					window.addEventListener(
 						"devicemotion",
 						function (event) {
-							document.getElementById("device-x").innerText = event.acceleration.x.toPrecision(2) + " m/s^2";
-							document.getElementById("device-y").innerText = event.acceleration.y.toPrecision(2) + " m/s^2";
-							document.getElementById("device-z").innerText = event.acceleration.z.toPrecision(2) + " m/s^2";
+							document.getElementById("device-x").innerText = event.acceleration.x.toFixed(2) + " m/s^2";
+							document.getElementById("device-y").innerText = event.acceleration.y.toFixed(2) + " m/s^2";
+							document.getElementById("device-z").innerText = event.acceleration.z.toFixed(2) + " m/s^2";
 
-							document.getElementById("device-dalpha").innerText = event.rotationRate.alpha.toPrecision(2) + " deg/s";
-							document.getElementById("device-dbeta").innerText = event.rotationRate.beta.toPrecision(2) + " deg/s";
-							document.getElementById("device-dgamma").innerText = event.rotationRate.gamma.toPrecision(2) + " deg/s";
+							document.getElementById("device-dalpha").innerText = event.rotationRate.alpha.toFixed(2) + " deg/s";
+							document.getElementById("device-dbeta").innerText = event.rotationRate.beta.toFixed(2) + " deg/s";
+							document.getElementById("device-dgamma").innerText = event.rotationRate.gamma.toFixed(2) + " deg/s";
 
-							tilt(event.rotationRate.beta * 0.01, event.rotationRate.alpha * 0.01);
+							rotationSamplesX[rotationSampleIndex] = event.rotationRate.beta;
+							rotationSamplesY[rotationSampleIndex] = event.rotationRate.alpha;
+							rotationSampleIndex = ++rotationSampleIndex % rotationSampleCount;
+
+							var averageRotationX = 0;
+							var averageRotationY = 0;
+
+							for (let sampleIndex = 0; sampleIndex < rotationSampleCount; sampleIndex++) {
+								averageRotationX += rotationSamplesX[sampleIndex];
+								averageRotationY += rotationSamplesY[sampleIndex];
+							}
+
+							averageRotationX /= rotationSampleCount;
+							averageRotationY /= rotationSampleCount;
+
+							tilt(averageRotationX * 0.001, averageRotationY * 0.001);
 						},
 						true
 						);
@@ -115,10 +138,10 @@
 				mouseX = event.clientX;
 				mouseY = event.clientY;
 
-				document.getElementById("mouse-x").innerText = "" + (mouseX.toPrecision(2));
-				document.getElementById("mouse-y").innerText = "" + (mouseY.toPrecision(2));
-				document.getElementById("mouse-dx").innerText = "" + ((mouseX - prevMouseX).toPrecision(2));
-				document.getElementById("mouse-dy").innerText = "" + ((mouseY - prevMouseY).toPrecision(2));
+				document.getElementById("mouse-x").innerText = "" + mouseX;
+				document.getElementById("mouse-y").innerText = "" + mouseY;
+				document.getElementById("mouse-dx").innerText = "" + (mouseX - prevMouseX);
+				document.getElementById("mouse-dy").innerText = "" + (mouseY - prevMouseY);
 
 				tilt((mouseX - prevMouseX) * 0.001, (mouseY - prevMouseY) * 0.001);
 
@@ -139,8 +162,8 @@
 				tiltX = clamp(tiltX + x, -1, 1);
 				tiltY = clamp(tiltY + y, -1, 1);
 
-				document.getElementById("tilt-x").innerText = "" + (tiltX.toPrecision(2));
-				document.getElementById("tilt-y").innerText = "" + (tiltY.toPrecision(2));
+				document.getElementById("tilt-x").innerText = "" + (tiltX.toFixed(2));
+				document.getElementById("tilt-y").innerText = "" + (tiltY.toFixed(2));
 
 				Array.prototype.forEach.call(
 					parallaxElements,
