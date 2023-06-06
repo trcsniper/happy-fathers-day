@@ -62,6 +62,12 @@
 			var parallaxParent;
 			var parallaxElements;
 
+			var prevMouseX = 0;
+			var prevMouseY = 0;
+
+			var tiltX = 0;
+			var tiltY = 0;
+
 			window.onload = function() {
 				parallaxParent = document.getElementById("parallax-stack");
 				parallaxElements = parallaxParent.getElementsByClassName("parallax");
@@ -76,7 +82,7 @@
 							document.getElementById("device-beta").innerText = event.beta.toPrecision(2) + " deg";
 							document.getElementById("device-gamma").innerText = event.gamma.toPrecision(2) + " deg";
 
-							tilt([event.beta, event.gamma]);
+							tilt(event.beta, event.gamma);
 						},
 						true
 						);
@@ -87,12 +93,14 @@
 						"devicemotion",
 						function (event) {
 							document.getElementById("device-x").innerText = event.acceleration.x.toPrecision(2) + " m/s^2";
-							document.getElementById("device-y").innerText = "" + event.acceleration.y.toPrecision(2) + " m/s^2";
-							document.getElementById("device-z").innerText = "" + event.acceleration.z.toPrecision(2) + " m/s^2";
+							document.getElementById("device-y").innerText = event.acceleration.y.toPrecision(2) + " m/s^2";
+							document.getElementById("device-z").innerText = event.acceleration.z.toPrecision(2) + " m/s^2";
 
 							document.getElementById("device-dalpha").innerText = event.rotationRate.alpha.toPrecision(2) + " deg/s";
-							document.getElementById("device-dbeta").innerText = "" + event.rotationRate.beta.toPrecision(2) + " deg/s";
-							document.getElementById("device-dgamma").innerText = "" + event.rotationRate.gamma.toPrecision(2) + " deg/s";
+							document.getElementById("device-dbeta").innerText = event.rotationRate.beta.toPrecision(2) + " deg/s";
+							document.getElementById("device-dgamma").innerText = event.rotationRate.gamma.toPrecision(2) + " deg/s";
+
+							tilt(event.rotationRate.beta * 0.01, event.rotationRate.alpha * 0.01);
 						},
 						true
 						);
@@ -104,9 +112,18 @@
 			}
 
 			window.onmousemove = function(event) {
-				var tiltX = ((event.clientX / document.documentElement.clientWidth) - 0.5) * 2;
-				var tiltY = ((event.clientY / document.documentElement.clientHeight) - 0.5) * 2;
-				tilt(tiltX, tiltY);
+				mouseX = event.clientX;
+				mouseY = event.clientY;
+
+				document.getElementById("mouse-x").innerText = "" + (mouseX.toPrecision(2));
+				document.getElementById("mouse-y").innerText = "" + (mouseY.toPrecision(2));
+				document.getElementById("mouse-dx").innerText = "" + ((mouseX - prevMouseX).toPrecision(2));
+				document.getElementById("mouse-dy").innerText = "" + ((mouseY - prevMouseY).toPrecision(2));
+
+				tilt((mouseX - prevMouseX) * 0.001, (mouseY - prevMouseY) * 0.001);
+
+				prevMouseX = mouseX;
+				prevMouseY = mouseY;
 			}
 
 			function setCanvasSize(x, y) {
@@ -114,12 +131,22 @@
 				parallaxParent.style.height = y + "px";
 			}
 			
+			function clamp(value, min, max) {
+				return Math.max(Math.min(value, max), min);
+			}
+			
 			function tilt(x, y) {
+				tiltX = clamp(tiltX + x, -1, 1);
+				tiltY = clamp(tiltY + y, -1, 1);
+
+				document.getElementById("tilt-x").innerText = "" + (tiltX.toPrecision(2));
+				document.getElementById("tilt-y").innerText = "" + (tiltY.toPrecision(2));
+
 				Array.prototype.forEach.call(
 					parallaxElements,
 					function(element) {
 						var scale = element.getAttribute("parallax-scale");
-						element.style.transform = "translate(" + (x * scale * 100) + "%, " + (y * scale * 100) + "%)";
+						element.style.transform = "translate(" + (tiltX * scale * 100) + "%, " + (tiltY * scale * 100) + "%)";
 					}
 					);
 			}
@@ -134,5 +161,8 @@
 		<p>Device Orientation<br /><span class="variable-label">α</span>: <span id="device-alpha" class="variable-value">0</span>, <span class="variable-label">β</span>: <span id="device-beta" class="variable-value">0</span>, <span class="variable-label">γ</span>: <span id="device-gamma" class="variable-value">0</span></p>
 		<p>Device Acceleration<br /><span class="variable-label">x</span>: <span id="device-x" class="variable-value">0</span>, <span class="variable-label">y</span>: <span id="device-y" class="variable-value">0</span>, <span class="variable-label">z</span>: <span id="device-z" class="variable-value">0</span></p>
 		<p>Device Rotation<br /><span class="variable-label">δα</span>: <span id="device-dalpha" class="variable-value">0</span>, <span class="variable-label">δβ</span>: <span id="device-dbeta" class="variable-value">0</span>, <span class="variable-label">δγ</span>: <span id="device-dgamma" class="variable-value">0</span></p>
+		<p>Mouse Movement<br /><span class="variable-label">δx</span>: <span id="mouse-dx" class="variable-value">0</span>, <span class="variable-label">δy</span>: <span id="mouse-dy" class="variable-value">0</span></p>
+		<p>Curosr Location<br /><span class="variable-label">δx</span>: <span id="mouse-x" class="variable-value">0</span>, <span class="variable-label">δy</span>: <span id="mouse-y" class="variable-value">0</span></p>
+		<p>Parallax Tilt<br /><span class="variable-label">x</span>: <span id="tilt-x" class="variable-value">0</span>, <span class="variable-label">δy</span>: <span id="tilt-y" class="variable-value">0</span></p>
 	</body>
 <html>
