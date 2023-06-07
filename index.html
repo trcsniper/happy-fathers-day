@@ -140,7 +140,7 @@
 			
 			function tilt(x, y) {
 				tiltX = clamp(tiltX + x, -1, 1);
-				tiltY = clamp(tiltY + y, -1, 1);
+				tiltY = clamp(tiltY + (y * 0.4), -1, 1);
 
 				Array.prototype.forEach.call(
 					parallaxElements,
