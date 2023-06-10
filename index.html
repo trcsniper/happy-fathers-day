@@ -5,6 +5,23 @@
 
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One">
 		<style>
+			@keyframes scale-up {
+				from { transform: scale(0); }
+				to { transform: scale(1); }
+			}
+
+			@keyframes wobble {
+				0% { transform: translate(-50%, -50%) rotate(0deg); }
+				25% { transform: translate(-50%, -50%) rotate(4deg); }
+				75% { transform: translate(-50%, -50%) rotate(-4deg); }
+				100% { transform: translate(-50%, -50%) rotate(0deg); }
+			}
+
+			@keyframes bobble {
+				from { transform: translate(-50%, -50%) rotate(-10deg); }
+				to { transform: translate(-50%, -50%) rotate(10deg); }
+			}
+
 			body {
 				margin: 0px;
 				padding: 0px;
@@ -32,8 +49,8 @@
 				height: 100%;
 			}
 
-			.content-background {
-				background-image: url(./parallax-layer-back.png);
+			.content-layer-0 {
+				background-image: url(./background.png);
 				background-size: cover;
 				background-position-x: center;
 				background-position-y: center;
@@ -41,25 +58,67 @@
 				padding: 10% 10% 10% 10%;
 			}
 
-			.content-foreground {
-				background-image: url(./parallax-layer-front.png);
-				background-size: cover;
-				background-position-x: right;
-				background-position-y: bottom;
-			}
-
-			.content-message {
+			.content-layer-1 {
 				background-position-x: center;
 				background-position-y: top;
 			}
 
-			.content-message div {
+			.content-layer-2 {
+				background-image: url(./parasol.png);
+				background-size: cover;
+				background-repeat: no-repeat;
+				background-position-x: center;
+				background-position-y: center;
+			}
+
+			.content-layer-1 div {
+				position: absolute;
+				left: 0%;
+				right: 0%;
+				top: 16%;
+			}
+
+			.content-layer-1 div div{
+				animation: 0.6s cubic-bezier(0.2, 1.4, 0.8, 1.4) normal forwards scale-up;
+				transform: scale(0);
+				position: relative;
+			}
+
+			.content-layer-1 div div div{
+				animation: 0.5s alternate ease-in-out 0s infinite both wobble;
+				left: 50%;
+				color: #ef6;
 				font-family: 'Cherry Bomb One', sans-serif;
-				margin-top: 200px;
 				font-size: 96pt;
-				color: #fff;
 				text-align: center;
+				text-shadow: #000 2px 6px 10px;
 				line-height: 85%;
+			}
+
+			.bobblehead-container {
+				position: relative;
+				left: 0%;
+				right: 0%;
+				bottom: 0%;
+				height: inherit;
+				max-height: 100%;
+			}
+
+			.bobblehead-body {
+				position: absolute;
+				height: 100%;
+				width: auto;
+				left: 50%;
+				transform: translateX(-50%);
+			}
+
+			.bobblehead-head {
+				animation: 0.5s alternate ease-in-out 0s infinite both bobble;
+				position: absolute;
+				left: 50%;
+				top: 50%;
+				bottom: 50%;
+				height: 25%;
 			}
 		</style>
 
@@ -154,9 +213,27 @@
 	</head>
 	<body>
 		<div id="parallax-stack">
-			<div class="parallax content-background" parallax-scale="-0.05"></div>
-			<div class="parallax content-message" parallax-scale="0.02"><div>HAPPY<br />FATHER'S<br />DAY!</div></div>
-			<div class="parallax content-foreground" parallax-scale="0.05"></div>
+			<div class="parallax content-layer-0" parallax-scale="-0.05"></div>
+			<div class="parallax content-layer-1" parallax-scale="-0.01">
+				<div>
+					<div style="animation-delay: 0.4s;">
+						<div style="animation-delay: 1.5s;">HAPPY</div>
+					</div>
+					<div style="animation-delay: 0.8s;">
+						<div style="animation-delay: 1.6s;">FATHER'S</div>
+					</div>
+					<div style="animation-delay: 1.2s;">
+						<div style="animation-delay: 1.7s;">DAY!</div>
+					</div>
+				</div>
+			</div>
+			<div class="parallax content-layer-2" parallax-scale="0.01"></div>
+			<div class="parallax content-layer-3" parallax-scale="0.05">
+				<div class="bobblehead-container">
+					<img src="bobblehead-body.png" class="bobblehead-body" />
+					<img src="bobblehead-head.png" class="bobblehead-head" />
+				</div>
+			</div>
 		</div>
 	</body>
 <html>
