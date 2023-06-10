@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Happy Father's Day!</title>
+
+		<meta property="og:image" content="https://trcsniper.github.io/happy-fathers-day/bobblehead-head.png" />
+
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One">
+		<style>
+			@keyframes scale-up {
+				from { transform: scale(0); }
+				to { transform: scale(1); }
+			}
+
+			@keyframes wobble {
+				0% { transform: translate(-50%, -50%) rotate(0deg); }
+				25% { transform: translate(-50%, -50%) rotate(4deg); }
+				75% { transform: translate(-50%, -50%) rotate(-4deg); }
+				100% { transform: translate(-50%, -50%) rotate(0deg); }
+			}
+
+			@keyframes bobble {
+				from { transform: translate(-50%, -50%) rotate(-10deg); }
+				to { transform: translate(-50%, -50%) rotate(10deg); }
+			}
+
+			body {
+				margin: 0px;
+				padding: 0px;
+			}
+
+			.variable-label {
+				font-family: 'Times New Roman', Times, serif;
+				font-style: italic;
+			}
+
+			.variable-value {
+				font-weight: bold;
+			}
+
+			#parallax-stack {
+				overflow: hidden;
+				position: relative;
+				width: 1920px;
+				height: 1080px;
+			}
+
+			.parallax {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+			}
+
+			.content-layer-0 {
+				background-image: url(./sab-background.jpg);
+				background-size: cover;
+				background-position-x: center;
+				background-position-y: center;
+				margin: -10% 0% 0% -10%;
+				padding: 10% 10% 10% 10%;
+			}
+
+			.content-layer-2 {
+				background-position-x: center;
+				background-position-y: top;
+			}
+
+			.content-layer-1 div, .content-layer-3 div {
+				position: absolute;
+				left: 0%;
+				right: 0%;
+			}
+
+			.content-layer-1 div {
+				top: 4%;
+			}
+
+			.content-layer-3 div {
+				bottom: 18%;
+			}
+
+			.content-layer-1 div div, .content-layer-3 div div {
+				animation: 0.6s cubic-bezier(0.2, 1.4, 0.8, 1.4) normal forwards scale-up;
+				transform: scale(0);
+				position: relative;
+			}
+
+			.content-layer-1 div div div, .content-layer-3 div div div {
+				animation: 0.5s alternate ease-in-out 0s infinite both wobble;
+				left: 50%;
+				color: #fff;
+				font-family: 'Cherry Bomb One', sans-serif;
+				font-size: 72pt;
+				text-align: center;
+				text-shadow: #000 2px 6px 10px;
+				line-height: 85%;
+			}
+
+			.bobblehead-container {
+				position: relative;
+				left: 0%;
+				right: 0%;
+				bottom: 0%;
+				height: inherit;
+				max-height: 100%;
+			}
+
+			.bobblehead-body {
+				position: absolute;
+				height: 100%;
+				width: auto;
+				left: 50%;
+				transform: translateX(-50%);
+			}
+
+			.bobblehead-head {
+				animation: 0.5s alternate ease-in-out 0s infinite both bobble;
+				position: absolute;
+				left: 50%;
+				top: 50%;
+				bottom: 50%;
+				height: 18%;
+			}
+		</style>
+
+		<script>
+			var parallaxParent;
+			var parallaxElements;
+
+			var prevMouseX = 0;
+			var prevMouseY = 0;
+
+			var tiltX = 0;
+			var tiltY = 0;
+
+			var rotationSampleCount = 4;
+			var rotationSampleIndex = 0;
+			var rotationSamplesX = [];
+			var rotationSamplesY = [];
+
+			window.onload = function() {
+				parallaxParent = document.getElementById("parallax-stack");
+				parallaxElements = parallaxParent.getElementsByClassName("parallax");
+
+				for (let sampleIndex = 0; sampleIndex < rotationSampleCount; sampleIndex++) {
+					rotationSamplesX[sampleIndex] = 0;
+					rotationSamplesY[sampleIndex] = 0;
+				}
+
+				setCanvasSize(document.documentElement.clientWidth, document.documentElement.clientHeight);
+
+				if (window.DeviceMotionEvent) {
+					window.addEventListener(
+						"devicemotion",
+						function (event) {
+							rotationSamplesX[rotationSampleIndex] = event.rotationRate.beta;
+							rotationSamplesY[rotationSampleIndex] = event.rotationRate.alpha;
+							rotationSampleIndex = ++rotationSampleIndex % rotationSampleCount;
+
+							var averageRotationX = 0;
+							var averageRotationY = 0;
+
+							for (let sampleIndex = 0; sampleIndex < rotationSampleCount; sampleIndex++) {
+								averageRotationX += rotationSamplesX[sampleIndex];
+								averageRotationY += rotationSamplesY[sampleIndex];
+							}
+
+							averageRotationX /= rotationSampleCount;
+							averageRotationY /= rotationSampleCount;
+
+							tilt(averageRotationX * 0.001, averageRotationY * 0.001);
+						},
+						true
+						);
+				}
+			}
+
+			window.onresize = function() {
+				setCanvasSize(document.documentElement.clientWidth, document.documentElement.clientHeight);
+			}
+
+			window.onmousemove = function(event) {
+				mouseX = event.clientX;
+				mouseY = event.clientY;
+
+				tilt((mouseX - prevMouseX) * 0.001, (mouseY - prevMouseY) * 0.001);
+
+				prevMouseX = mouseX;
+				prevMouseY = mouseY;
+			}
+
+			function setCanvasSize(x, y) {
+				parallaxParent.style.width = x + "px";
+				parallaxParent.style.height = y + "px";
+			}
+			
+			function clamp(value, min, max) {
+				return Math.max(Math.min(value, max), min);
+			}
+			
+			function tilt(x, y) {
+				tiltX = clamp(tiltX + x, -1, 1);
+				tiltY = clamp(tiltY + (y * 0.4), -1, 1);
+
+				Array.prototype.forEach.call(
+					parallaxElements,
+					function(element) {
+						var scale = element.getAttribute("parallax-scale");
+						element.style.transform = "translate(" + (tiltX * scale * 100) + "%, " + (tiltY * scale * 100) + "%)";
+					}
+					);
+			}
+		</script>
+	</head>
+	<body>
+		<div id="parallax-stack">
+			<div class="parallax content-layer-0" parallax-scale="-0.05"></div>
+			<div class="parallax content-layer-1" parallax-scale="-0.01">
+				<div>
+					<div style="animation-delay: 0.4s;">
+						<div style="animation-delay: 1.5s;">HAPPY</div>
+					</div>
+					<div style="animation-delay: 0.8s;">
+						<div style="animation-delay: 1.6s;">FATHER'S</div>
+					</div>
+					<div style="animation-delay: 1.2s;">
+						<div style="animation-delay: 1.7s;">DAY!</div>
+					</div>
+				</div>
+			</div>
+			<div class="parallax content-layer-2" parallax-scale="0.01">
+				<div class="bobblehead-container">
+					<img src="sab-bobblehead-body.png" class="bobblehead-body" />
+					<img src="sab-bobblehead-dad.png" class="bobblehead-head" style="left: 50%; top: 24%" />
+					<img src="sab-bobblehead-sab.png" class="bobblehead-head" style="left: 51%; top: 40%" />
+				</div>
+			</div>
+			<div class="parallax content-layer-3" parallax-scale="0.05">
+			<div>
+				<div style="animation-delay: 1.8s;">
+					<div style="animation-delay: 2.1s;">LOVE FROM</div>
+				</div>
+				<div style="animation-delay: 2.2s;">
+					<div style="animation-delay: 2.2s;">YOUR</div>
+				</div>
+				<div style="animation-delay: 2.6s;">
+					<div style="animation-delay: 2.3s;">BROWN BABY</div>
+				</div>
+			</div>
+		</div>
+	</body>
+<html>
